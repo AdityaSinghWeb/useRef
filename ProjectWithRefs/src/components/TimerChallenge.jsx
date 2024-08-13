@@ -10,7 +10,7 @@ function TimerChallenge({ title, targetTime }) {
 
   if (remainingTime <= 0) {
       clearInterval(timer.current);
-    dialog.current.showModal();
+    dialog.current.open();
   }
 
   function handleReset() {
@@ -24,7 +24,7 @@ function TimerChallenge({ title, targetTime }) {
   }
 
   function handleStop() {
-    dialog.current.showModal();
+    dialog.current.open();
     clearInterval(timer.current);
   }
 
