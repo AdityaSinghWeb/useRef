@@ -1,40 +1,58 @@
 import React, { useRef, useState } from "react";
+import ResultModal from "./ResultModal";
 
 function TimerChallenge({ title, targetTime }) {
-  const [timerExpired, setTimerExpired] = useState(false);
-  const [timerStarted, setTimerStarted] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(targetTime * 1000);
   const timer = useRef();
+  const dialog = useRef();
+
+  const activeTime = remainingTime > 0 && remainingTime < targetTime * 1000;
+
+  if (remainingTime <= 0) {
+      clearInterval(timer.current);
+    dialog.current.showModal();
+  }
+
+  function handleReset() {
+    setRemainingTime(targetTime * 1000);
+  }
 
   function handleStart() {
-    setTimerStarted(true);
-    timer.current = setTimeout(() => {
-      setTimerExpired(true);
-    }, targetTime * 1000);
+    timer.current = setInterval(() => {
+      setRemainingTime((prevRemainingTime) => prevRemainingTime - 10);
+    }, 10);
   }
 
   function handleStop() {
-    clearTimeout(timer.current);
+    dialog.current.showModal();
+    clearInterval(timer.current);
   }
 
   return (
     <>
+      {
+        <ResultModal
+          ref={dialog}
+          targetTime={targetTime}
+          onReset={handleReset}
+          timeRemaining={remainingTime}
+        />
+      }
       <section className="challenge">
         <h2>{title}</h2>
-        {timerExpired && <p>Lost</p>}
         <p className="challenge-time">
           {targetTime} second{targetTime > 1 ? "s" : ""}
         </p>
         <p>
-          <button onClick={timerStarted ? handleStop : handleStart}>
-            {timerStarted ? "Stop" : "Start"} Challenge
+          <button onClick={activeTime ? handleStop : handleStart}>
+            {activeTime ? "Stop" : "Start"} Challenge
           </button>
         </p>
-        <p className={timerStarted ? "active" : undefined}>
-          {timerStarted ? "Time is running...." : "Timer inactive"}{" "}
+        <p className={activeTime ? "active" : undefined}>
+          {activeTime ? "Time is running...." : "Timer inactive"}
         </p>
       </section>
     </>
   );
 }
-
 export default TimerChallenge;
